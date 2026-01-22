@@ -1,4 +1,4 @@
-package com.example.calculator.model
+package com.example.calculator.domain.model
 
 enum class ArithmaticOperation(val symbol: String) {
     ADD("+"),
@@ -9,7 +9,7 @@ enum class ArithmaticOperation(val symbol: String) {
     NONE("")
 }
 
-enum class TrigonometricOperation(val symbol: String) {
+enum class TrigonometricOperation(symbol: String) {
     SIN("sin"),
     COS("cos"),
     TAN("tan"),

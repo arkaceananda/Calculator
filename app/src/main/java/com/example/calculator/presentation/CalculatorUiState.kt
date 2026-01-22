@@ -1,8 +1,8 @@
 package com.example.calculator.presentation
 
-import com.example.calculator.model.ArithmaticOperation
-import com.example.calculator.model.HistoryItem
-import com.example.calculator.model.TrigonometricOperation
+import com.example.calculator.domain.model.ArithmaticOperation
+import com.example.calculator.domain.model.HistoryItem
+import com.example.calculator.domain.model.TrigonometricOperation
 
 data class CalculatorUiState(
     val displayText: String = "0",

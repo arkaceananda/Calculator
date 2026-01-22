@@ -1,6 +1,6 @@
 package com.example.calculator.domain.calculator
 
-import com.example.calculator.model.CalculationResult
+import com.example.calculator.domain.model.CalculationResult
 import kotlin.math.PI
 import kotlin.math.abs
 import kotlin.math.cos

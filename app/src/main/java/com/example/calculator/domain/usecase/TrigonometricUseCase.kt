@@ -1,7 +1,7 @@
-package com.example.calculator.usecase
+package com.example.calculator.domain.usecase
 
-import com.example.calculator.model.CalculationResult
-import com.example.calculator.model.TrigonometricOperation
+import com.example.calculator.domain.model.CalculationResult
+import com.example.calculator.domain.model.TrigonometricOperation
 import com.example.calculator.domain.calculator.TrigonometricEngine
 
 class TrigonometricUseCase (private val calculator: TrigonometricEngine = TrigonometricEngine()) {

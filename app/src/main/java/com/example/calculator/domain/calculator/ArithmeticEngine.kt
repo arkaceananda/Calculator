@@ -1,6 +1,6 @@
 package com.example.calculator.domain.calculator
 
-import com.example.calculator.model.CalculationResult
+import com.example.calculator.domain.model.CalculationResult
 
 class ArithmeticEngine {
     fun add(num1: Double, num2: Double): CalculationResult {

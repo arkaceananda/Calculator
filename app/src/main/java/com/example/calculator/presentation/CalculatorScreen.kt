@@ -1,33 +1,45 @@
 package com.example.calculator.presentation
 
+import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.foundation.background
+import androidx.compose.foundation.interaction.MutableInteractionSource
+import androidx.compose.foundation.interaction.collectIsPressedAsState
 import androidx.compose.foundation.layout.*
-import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.unit.TextUnit
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
-import com.example.calculator.model.ArithmaticOperation
-import com.example.calculator.model.TrigonometricOperation
+import com.example.calculator.domain.model.ArithmaticOperation
+import com.example.calculator.domain.model.TrigonometricOperation
+import androidx.compose.ui.platform.LocalHapticFeedback
+import androidx.compose.ui.hapticfeedback.HapticFeedbackType
+import com.example.calculator.ui.theme.CalculatorTheme
+
 
 @Composable
 fun CalculatorScreen(
     viewModel: CalculatorViewModel = viewModel()
 ) {
     val uiState by viewModel.uiState.collectAsState()
+    val colors = CalculatorTheme.colors
+    val typography = CalculatorTheme.typography
 
     Column(
         modifier = Modifier
             .fillMaxSize()
-            .background(Color.Black)
+            .background(colors.background)
             .safeDrawingPadding()
             .padding(horizontal = 20.dp)
             .padding(bottom = 32.dp, top = 16.dp),
@@ -43,10 +55,11 @@ fun CalculatorScreen(
             if (uiState.expressionText.isNotEmpty()) {
                 Text(
                     text = uiState.expressionText,
-                    fontSize = 32.sp,
-                    fontWeight = FontWeight.Normal,
-                    color = Color.White.copy(alpha = 0.5f),
-                    textAlign = TextAlign.End,
+                    style = typography.bodyLarge.copy(
+                        fontSize = 32.sp,
+                        color = colors.textSecondary,
+                        textAlign = TextAlign.End
+                    ),
                     modifier = Modifier
                         .fillMaxWidth()
                         .padding(horizontal = 8.dp, vertical = 8.dp),
@@ -56,10 +69,12 @@ fun CalculatorScreen(
 
             Text(
                 text = uiState.displayText,
-                fontSize = 64.sp,
-                fontWeight = FontWeight.Light,
-                color = if (uiState.isError) Color(0xFFFF453A) else Color.White,
-                textAlign = TextAlign.End,
+                style = typography.displayLarge.copy(
+                    fontSize = 64.sp,
+                    fontWeight = FontWeight.Light,
+                    color = if (uiState.isError) colors.danger else colors.textPrimary,
+                    textAlign = TextAlign.End
+                ),
                 modifier = Modifier
                     .fillMaxWidth()
                     .padding(horizontal = 8.dp, vertical = 16.dp),
@@ -80,32 +95,32 @@ fun CalculatorScreen(
                     text = "SIN",
                     onClick = { viewModel.onTrigonometricClick(TrigonometricOperation.SIN) },
                     modifier = Modifier.weight(1f),
-                    backgroundColor = Color(0xFF505050),
-                    textColor = Color.White,
+                    backgroundColor = colors.accent,
+                    textColor = Color.Black,
                     fontSize = 22.sp
                 )
                 CalculatorButton(
                     text = "COS",
                     onClick = { viewModel.onTrigonometricClick(TrigonometricOperation.COS) },
                     modifier = Modifier.weight(1f),
-                    backgroundColor = Color(0xFF505050),
-                    textColor = Color.White,
+                    backgroundColor = colors.accent,
+                    textColor = Color.Black,
                     fontSize = 22.sp
                 )
                 CalculatorButton(
                     text = "TAN",
                     onClick = { viewModel.onTrigonometricClick(TrigonometricOperation.TAN) },
                     modifier = Modifier.weight(1f),
-                    backgroundColor = Color(0xFF505050),
-                    textColor = Color.White,
+                    backgroundColor = colors.accent,
+                    textColor = Color.Black,
                     fontSize = 22.sp
                 )
                 CalculatorButton(
                     text = "DEL",
                     onClick = { viewModel.deleteLastDigit() },
                     modifier = Modifier.weight(1f),
-                    backgroundColor = Color(0xFFD4D4D2),
-                    textColor = Color.Black,
+                    backgroundColor = colors.danger,
+                    textColor = colors.textPrimary,
                     fontSize = 22.sp
                 )
             }
@@ -117,28 +132,28 @@ fun CalculatorScreen(
                     text = "(",
                     onClick = { viewModel.onParenthesisClick("(") },
                     modifier = Modifier.weight(1f),
-                    backgroundColor = Color(0xFF505050),
-                    textColor = Color.White
+                    backgroundColor = colors.neutralButton,
+                    textColor = colors.textPrimary
                 )
                 CalculatorButton(
                     text = ")",
                     onClick = { viewModel.onParenthesisClick(")") },
                     modifier = Modifier.weight(1f),
-                    backgroundColor = Color(0xFF505050),
-                    textColor = Color.White
+                    backgroundColor = colors.neutralButton,
+                    textColor = colors.textPrimary
                 )
                 CalculatorButton(
                     text = "%",
                     onClick = { viewModel.onOperationClick(ArithmaticOperation.MODULO) },
                     modifier = Modifier.weight(1f),
-                    backgroundColor = Color(0xFF505050),
-                    textColor = Color.White
+                    backgroundColor = colors.neutralButton,
+                    textColor = colors.textPrimary
                 )
                 CalculatorButton(
                     text = "÷",
                     onClick = { viewModel.onOperationClick(ArithmaticOperation.DIVIDE) },
                     modifier = Modifier.weight(1f),
-                    backgroundColor = Color(0xFFFF9F0A),
+                    backgroundColor = colors.operatorButton,
                     textColor = Color.White
                 )
             }
@@ -149,23 +164,29 @@ fun CalculatorScreen(
                 CalculatorButton(
                     text = "7",
                     onClick = { viewModel.onNumberClick("7") },
-                    modifier = Modifier.weight(1f)
+                    modifier = Modifier.weight(1f),
+                    backgroundColor = colors.numberButton,
+                    textColor = colors.textPrimary
                 )
                 CalculatorButton(
                     text = "8",
                     onClick = { viewModel.onNumberClick("8") },
-                    modifier = Modifier.weight(1f)
+                    modifier = Modifier.weight(1f),
+                    backgroundColor = colors.numberButton,
+                    textColor = colors.textPrimary
                 )
                 CalculatorButton(
                     text = "9",
                     onClick = { viewModel.onNumberClick("9") },
-                    modifier = Modifier.weight(1f)
+                    modifier = Modifier.weight(1f),
+                    backgroundColor = colors.numberButton,
+                    textColor = colors.textPrimary
                 )
                 CalculatorButton(
                     text = "×",
                     onClick = { viewModel.onOperationClick(ArithmaticOperation.MULTIPLY) },
                     modifier = Modifier.weight(1f),
-                    backgroundColor = Color(0xFFFF9F0A),
+                    backgroundColor = colors.operatorButton,
                     textColor = Color.White
                 )
             }
@@ -176,23 +197,29 @@ fun CalculatorScreen(
                 CalculatorButton(
                     text = "4",
                     onClick = { viewModel.onNumberClick("4") },
-                    modifier = Modifier.weight(1f)
+                    modifier = Modifier.weight(1f),
+                    backgroundColor = colors.numberButton,
+                    textColor = colors.textPrimary
                 )
                 CalculatorButton(
                     text = "5",
                     onClick = { viewModel.onNumberClick("5") },
-                    modifier = Modifier.weight(1f)
+                    modifier = Modifier.weight(1f),
+                    backgroundColor = colors.numberButton,
+                    textColor = colors.textPrimary
                 )
                 CalculatorButton(
                     text = "6",
                     onClick = { viewModel.onNumberClick("6") },
-                    modifier = Modifier.weight(1f)
+                    modifier = Modifier.weight(1f),
+                    backgroundColor = colors.numberButton,
+                    textColor = colors.textPrimary
                 )
                 CalculatorButton(
                     text = "−",
                     onClick = { viewModel.onOperationClick(ArithmaticOperation.SUBTRACT) },
                     modifier = Modifier.weight(1f),
-                    backgroundColor = Color(0xFFFF9F0A),
+                    backgroundColor = colors.operatorButton,
                     textColor = Color.White
                 )
             }
@@ -203,23 +230,29 @@ fun CalculatorScreen(
                 CalculatorButton(
                     text = "1",
                     onClick = { viewModel.onNumberClick("1") },
-                    modifier = Modifier.weight(1f)
+                    modifier = Modifier.weight(1f),
+                    backgroundColor = colors.numberButton,
+                    textColor = colors.textPrimary
                 )
                 CalculatorButton(
                     text = "2",
                     onClick = { viewModel.onNumberClick("2") },
-                    modifier = Modifier.weight(1f)
+                    modifier = Modifier.weight(1f),
+                    backgroundColor = colors.numberButton,
+                    textColor = colors.textPrimary
                 )
                 CalculatorButton(
                     text = "3",
                     onClick = { viewModel.onNumberClick("3") },
-                    modifier = Modifier.weight(1f)
+                    modifier = Modifier.weight(1f),
+                    backgroundColor = colors.numberButton,
+                    textColor = colors.textPrimary
                 )
                 CalculatorButton(
                     text = "+",
                     onClick = { viewModel.onOperationClick(ArithmaticOperation.ADD) },
                     modifier = Modifier.weight(1f),
-                    backgroundColor = Color(0xFFFF9F0A),
+                    backgroundColor = colors.operatorButton,
                     textColor = Color.White
                 )
             }
@@ -231,24 +264,28 @@ fun CalculatorScreen(
                     text = "AC",
                     onClick = { viewModel.clearAll() },
                     modifier = Modifier.weight(1f),
-                    backgroundColor = Color(0xFFD4D4D2),
-                    textColor = Color.Black,
+                    backgroundColor = colors.danger,
+                    textColor = colors.textPrimary,
                 )
                 CalculatorButton(
                     text = "0",
                     onClick = { viewModel.onNumberClick("0") },
-                    modifier = Modifier.weight(1f)
+                    modifier = Modifier.weight(1f),
+                    backgroundColor = colors.numberButton,
+                    textColor = colors.textPrimary
                 )
                 CalculatorButton(
                     text = ".",
                     onClick = { viewModel.onDecimalClick() },
-                    modifier = Modifier.weight(1f)
+                    modifier = Modifier.weight(1f),
+                    backgroundColor = colors.numberButton,
+                    textColor = colors.textPrimary
                 )
                 CalculatorButton(
                     text = "=",
                     onClick = { viewModel.calculateResult() },
                     modifier = Modifier.weight(1f),
-                    backgroundColor = Color(0xFFFF9F0A),
+                    backgroundColor = colors.operatorButton,
                     textColor = Color.White
                 )
             }
@@ -261,24 +298,48 @@ fun CalculatorButton(
     text: String,
     onClick: () -> Unit,
     modifier: Modifier = Modifier,
-    backgroundColor: Color = Color(0xFF333333),
-    textColor: Color = Color.White,
-    fontSize: androidx.compose.ui.unit.TextUnit = 28.sp
+    backgroundColor: Color = MaterialTheme.colorScheme.secondary,
+    textColor: Color = MaterialTheme.colorScheme.onSecondary,
+    fontSize: TextUnit = 28.sp
 ) {
+    val interactionSource = remember { MutableInteractionSource() }
+    val isPressed by interactionSource.collectIsPressedAsState()
+    val haptic = LocalHapticFeedback.current
+    val scale by animateFloatAsState(
+        targetValue = if (isPressed) 0.92f else 1f,
+        label = "press-scale"
+    )
+    val typography = CalculatorTheme.typography
+
     Button(
-        onClick = onClick,
-        modifier = modifier.height(75.dp),
+        onClick = {
+            haptic.performHapticFeedback(HapticFeedbackType.TextHandleMove)
+            onClick()
+        },
+        interactionSource = interactionSource,
+        modifier = modifier
+            .height(75.dp)
+            .graphicsLayer(
+                scaleX = scale,
+                scaleY = scale
+            ),
+        elevation = ButtonDefaults.buttonElevation(
+            defaultElevation = 4.dp,
+            pressedElevation = 1.dp
+        ),
         colors = ButtonDefaults.buttonColors(
             containerColor = backgroundColor
         ),
-        shape = CircleShape,
+        shape = RoundedCornerShape(14.dp),
         contentPadding = PaddingValues(0.dp)
     ) {
         Text(
             text = text,
-            fontSize = fontSize,
-            fontWeight = FontWeight.Normal,
-            color = textColor
+            style = typography.bodyLarge.copy(
+                fontSize = fontSize,
+                fontWeight = FontWeight.Medium,
+                color = textColor
+            )
         )
     }
 }

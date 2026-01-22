@@ -1,10 +1,11 @@
 package com.example.calculator.presentation
 
 import androidx.lifecycle.ViewModel
-import com.example.calculator.model.ArithmaticOperation
-import com.example.calculator.model.CalculationResult
-import com.example.calculator.model.TrigonometricOperation
-import com.example.calculator.usecase.TrigonometricUseCase
+import com.example.calculator.domain.model.ArithmaticOperation
+import com.example.calculator.domain.model.CalculationResult
+import com.example.calculator.domain.model.TrigonometricOperation
+import com.example.calculator.domain.usecase.ArithmeticUseCase
+import com.example.calculator.domain.usecase.TrigonometricUseCase
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -13,7 +14,8 @@ import net.objecthunter.exp4j.ExpressionBuilder
 import java.util.Locale
 
 class CalculatorViewModel(
-    private val trigonometricUseCase: TrigonometricUseCase = TrigonometricUseCase()
+    private val trigonometricUseCase: TrigonometricUseCase = TrigonometricUseCase(),
+    private val arithmeticUseCase: ArithmeticUseCase = ArithmeticUseCase()
 ) : ViewModel() {
 
     private val _uiState = MutableStateFlow(CalculatorUiState())
@@ -54,8 +56,6 @@ class CalculatorViewModel(
                     ("${currentState.expressionText}${baseInput} ${operation.symbol} " to "0")
                 }
                 currentState.expressionText.isNotEmpty() -> {
-                    // PERBAIKAN: Regex ini sekarang mencakup huruf 'x' dan '-' (dash) 
-                    // serta simbol visual lainnya agar PASTI terhapus.
                     val cleanExpression = currentState.expressionText.trimEnd()
                         .replace(Regex("[x÷+\\-−× ]+$"), "")
                     ("$cleanExpression ${operation.symbol} " to "0")
@@ -88,9 +88,10 @@ class CalculatorViewModel(
 
         try {
             val finalExpression = prepareExpression(rawExpression)
-            val result = ExpressionBuilder(finalExpression).build().evaluate()
+            val resultValue = ExpressionBuilder(finalExpression).build().evaluate()
+            arithmeticUseCase.execute(resultValue, 0.0, ArithmaticOperation.NONE)
 
-            val formattedResult = formatResult(result)
+            val formattedResult = formatResult(resultValue)
             _uiState.update {
                 it.copy(
                     expressionText = rawExpression,
