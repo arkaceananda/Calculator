@@ -3,6 +3,7 @@ package com.example.calculator.presentation
 import androidx.lifecycle.ViewModel
 import com.example.calculator.domain.model.ArithmaticOperation
 import com.example.calculator.domain.model.CalculationResult
+import com.example.calculator.domain.model.HistoryItem
 import com.example.calculator.domain.model.TrigonometricOperation
 import com.example.calculator.domain.usecase.ArithmeticUseCase
 import com.example.calculator.domain.usecase.TrigonometricUseCase
@@ -27,7 +28,8 @@ class CalculatorViewModel(
                 CalculatorUiState(
                     currentInput = number,
                     displayText = number,
-                    showResult = false
+                    showResult = false,
+                    history = it.history
                 )
             }
             return
@@ -89,9 +91,11 @@ class CalculatorViewModel(
         try {
             val finalExpression = prepareExpression(rawExpression)
             val resultValue = ExpressionBuilder(finalExpression).build().evaluate()
+            
+            val formattedResult = formatResult(resultValue)
+            addToHistory(rawExpression, formattedResult)
             arithmeticUseCase.execute(resultValue, 0.0, ArithmaticOperation.NONE)
 
-            val formattedResult = formatResult(resultValue)
             _uiState.update {
                 it.copy(
                     expressionText = rawExpression,
@@ -135,15 +139,19 @@ class CalculatorViewModel(
     }
 
     fun onTrigonometricClick(operation: TrigonometricOperation) {
-        val angle = _uiState.value.currentInput.toDoubleOrNull() ?: return
+        val angleText = _uiState.value.currentInput
+        val angle = angleText.toDoubleOrNull() ?: return
         val result = trigonometricUseCase.execute(angle, operation)
         if (result is CalculationResult.Success) {
             val formatted = formatResult(result.value)
+            
+            addToHistory("${operation.name}($angleText)", formatted)
+
             _uiState.update { it.copy(displayText = formatted, currentInput = formatted, showResult = true) }
         }
     }
 
-    fun clearAll() { _uiState.update { CalculatorUiState() } }
+    fun clearAll() { _uiState.update { currentState -> CalculatorUiState(history = currentState.history) } }
 
     fun deleteLastDigit() {
         if (_uiState.value.showResult) { clearAll(); return }
@@ -159,7 +167,7 @@ class CalculatorViewModel(
 
     fun onDecimalClick() {
         if (_uiState.value.showResult) {
-            _uiState.update { CalculatorUiState(currentInput = "0.", displayText = "0.") }
+            _uiState.update { currentState -> CalculatorUiState(currentInput = "0.", displayText = "0.", history = currentState.history) }
             return
         }
         _uiState.update { currentState ->
@@ -182,5 +190,33 @@ class CalculatorViewModel(
                 currentInput = "0", displayText = "0", showResult = false
             )
         }
+    }
+    
+    fun toggleHistoryExpanded() {
+        _uiState.update { it.copy(isHistoryExpanded = !it.isHistoryExpanded) }
+    }
+    
+    fun clearHistory() {
+        _uiState.update { it.copy(history = emptyList()) }
+    }
+    
+    fun onHistoryItemClick(item: HistoryItem) {
+        _uiState.update { 
+            it.copy(
+                currentInput = item.result,
+                displayText = item.result,
+                expressionText = "",
+                showResult = false,
+                isHistoryExpanded = false
+            )
+        }
+    }
+    
+    private fun addToHistory(expression: String, result: String) {
+        val newItem = HistoryItem(
+            expression = expression,
+            result = result
+        )
+        _uiState.update { it.copy(history = listOf(newItem) + it.history) }
     }
 }

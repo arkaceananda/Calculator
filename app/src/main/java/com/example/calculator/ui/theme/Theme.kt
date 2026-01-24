@@ -1,6 +1,5 @@
 package com.example.calculator.ui.theme
 
-import android.os.Build
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.darkColorScheme
@@ -11,13 +10,13 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.ui.platform.LocalContext
 
-private val DarkColors = darkColorScheme(
+private val MaterialDarkColorsScheme = darkColorScheme(
     primary = Purple80,
     secondary = PurpleGrey80,
     tertiary = Pink80
 )
 
-private val LightColors = lightColorScheme(
+private val MaterialLightColorsScheme = lightColorScheme(
     primary = Purple40,
     secondary = PurpleGrey40,
     tertiary = Pink40
@@ -35,11 +34,11 @@ fun CalculatorTheme(
             val context = LocalContext.current
             if (darkTheme) dynamicDarkColorScheme(context) else dynamicLightColorScheme(context)
         }
-        darkTheme -> DarkColors
-        else -> LightColors
+        darkTheme -> MaterialDarkColorsScheme
+        else -> MaterialLightColorsScheme
     }
 
-    val customColors = if (darkTheme) DarkColors else LightColors
+    val customColors = if (darkTheme) CustomDarkColors else CustomLightColors
 
     CompositionLocalProvider(LocalCalculatorColors provides customColors) {
         MaterialTheme(

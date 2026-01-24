@@ -8,19 +8,17 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.sp
 import com.example.calculator.R
 
-
-val Orbiton = FontFamily(
-    Font(R.font.orbitron_regular, FontWeight.Normal),
-    Font(R.font.orbitron_medium, FontWeight.Medium)
+val Inter = FontFamily(
+    Font(R.font.inter_24pt_regular)
 )
 val Typography = Typography(
     bodyLarge = TextStyle(
-        fontFamily = Orbiton,
+        fontFamily = Inter,
         fontWeight = FontWeight.Normal,
         fontSize = 16.sp
     ),
     displayLarge = TextStyle(
-        fontFamily = Orbiton,
+        fontFamily = Inter,
         fontWeight = FontWeight.Medium,
         fontSize = 64.sp
     )
