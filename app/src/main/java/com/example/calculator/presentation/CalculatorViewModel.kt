@@ -43,7 +43,6 @@ class CalculatorViewModel(
             )
         }
     }
-
     fun onOperationClick(operation: ArithmaticOperation) {
         if (_uiState.value.isError) return
 

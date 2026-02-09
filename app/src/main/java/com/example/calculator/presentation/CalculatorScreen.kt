@@ -2,6 +2,7 @@ package com.example.calculator.presentation
 
 import androidx.compose.animation.*
 import androidx.compose.animation.core.animateFloatAsState
+import androidx.compose.animation.core.tween
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.interaction.MutableInteractionSource
@@ -62,8 +63,8 @@ fun CalculatorScreen(
         }
         AnimatedVisibility(
             visible = uiState.isHistoryExpanded,
-            enter = slideInHorizontally(initialOffsetX = { it }),
-            exit = slideOutHorizontally(targetOffsetX = { it })
+            enter = fadeIn(initialAlpha = 0.3f) + expandVertically(),
+            exit = fadeOut(animationSpec = tween(durationMillis = 500)) + shrinkOut()
         ) {
             FullHistoryScreen(
                 history = uiState.history,
@@ -412,7 +413,7 @@ fun FullHistoryScreen(
                     Text(
                         text = "−",
                         fontSize = 24.sp,
-                        color = Color.White,
+                        color = Color.Black,
                         fontWeight = FontWeight.Bold
                     )
                 }
